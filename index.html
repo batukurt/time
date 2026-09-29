@@ -1,3 +1,10 @@
+Here is the updated code with:
+
+1. **Much larger main clock numbers** (`clamp(7rem, 24vw, 20rem)`).
+2. **Vertically stacked cities** on the bottom-left.
+3. **Sorted chronologically**, ensuring **same-day hours appear first** and **`+1d` (next day) hours appear strictly last** at the bottom.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +44,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden; /* eliminates iframe scrollbars */
+      overflow: hidden;
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
@@ -60,10 +67,10 @@
     .dashboard {
       height: 100vh;
       width: 100vw;
-      padding: 1rem 1.5rem;
+      padding: 1.2rem 2rem;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      gap: 0.75rem;
+      position: relative;
     }
 
     .top-bar {
@@ -71,6 +78,7 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       gap: 1rem;
+      z-index: 10;
     }
 
     .date-badge {
@@ -78,14 +86,14 @@
       flex-direction: column;
     }
     .date-iso {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       color: var(--lux-blue);
       font-variant-numeric: tabular-nums;
     }
     .day-name {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -105,8 +113,8 @@
       border: none;
       background: transparent;
       color: var(--text-muted);
-      padding: 5px 11px;
-      font-size: 0.72rem;
+      padding: 5px 12px;
+      font-size: 0.75rem;
       font-weight: 600;
       border-radius: 9999px;
       cursor: pointer;
@@ -127,90 +135,130 @@
     .weather-forecast-strip {
       display: flex;
       justify-content: flex-end;
-      gap: 5px;
+      gap: 6px;
     }
     .weather-cell {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 4px 7px;
+      padding: 5px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 44px;
+      min-width: 48px;
     }
-    .weather-hour { font-size: 0.62rem; color: var(--text-muted); }
-    .weather-icon { font-size: 0.85rem; margin: 2px 0; }
-    .weather-temp { font-size: 0.75rem; font-weight: 700; }
-    .weather-pop { font-size: 0.6rem; color: var(--lux-blue); font-weight: 600; }
+    .weather-hour { font-size: 0.65rem; color: var(--text-muted); }
+    .weather-icon { font-size: 0.9rem; margin: 2px 0; }
+    .weather-temp { font-size: 0.8rem; font-weight: 700; }
+    .weather-pop { font-size: 0.62rem; color: var(--lux-blue); font-weight: 600; }
 
+    /* Enlarged Main Clock */
     .center-clock-stage {
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
     }
     .clock-digits {
-      font-size: clamp(4.5rem, 16vw, 13rem);
-      font-weight: 700;
-      letter-spacing: -2px;
-      line-height: 0.95;
+      font-size: clamp(7rem, 24vw, 20rem);
+      font-weight: 800;
+      letter-spacing: -4px;
+      line-height: 0.88;
       font-variant-numeric: tabular-nums;
       display: flex;
       align-items: baseline;
     }
     .clock-seconds {
-      font-size: 0.38em;
-      margin-left: 0.15em;
+      font-size: 0.32em;
+      margin-left: 0.12em;
       color: var(--lux-blue);
       font-weight: 600;
       opacity: 0.95;
     }
     .clock-ampm {
-      font-size: 0.22em;
-      margin-left: 0.25em;
+      font-size: 0.2em;
+      margin-left: 0.2em;
       color: var(--lux-red);
       font-weight: 700;
       letter-spacing: 1px;
     }
 
+    /* Bottom Bar & Vertical Stacking */
     .bottom-bar {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
       gap: 1.5rem;
-      padding-bottom: 0.25rem;
+      z-index: 10;
+      pointer-events: auto;
     }
-    .hubs-grid {
+
+    .hubs-vertical-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      max-width: 82%;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 38vh;
+      overflow-y: auto;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--card-border) transparent;
     }
+    .hubs-vertical-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .hubs-vertical-list::-webkit-scrollbar-thumb {
+      background: var(--card-border);
+      border-radius: 4px;
+    }
+
     .hub-pill {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 7px;
-      padding: 4px 9px;
+      border-radius: 6px;
+      padding: 4px 10px;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      font-size: 0.72rem;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 0.74rem;
+      min-width: 180px;
     }
     .hub-name { color: var(--text-muted); font-weight: 500; }
-    .hub-time { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-main); }
-    .hub-day-offset { font-size: 0.6rem; color: var(--lux-blue); font-weight: 700; }
+    .hub-time-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .hub-time {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-main);
+    }
+    .hub-day-offset {
+      font-size: 0.62rem;
+      color: var(--lux-blue);
+      font-weight: 700;
+      background: rgba(0, 161, 222, 0.12);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
 
     .location-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 9px;
-      padding: 6px 12px;
+      padding: 7px 14px;
       text-align: right;
       white-space: nowrap;
     }
-    .loc-city { font-size: 0.8rem; font-weight: 700; }
-    .loc-tz { font-size: 0.68rem; color: var(--lux-blue); font-weight: 600; }
+    .loc-city { font-size: 0.85rem; font-weight: 700; }
+    .loc-tz { font-size: 0.72rem; color: var(--lux-blue); font-weight: 600; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -235,7 +283,6 @@
         <button class="btn-toggle" id="btnSec">Sec: Off</button>
         <button class="btn-toggle active" id="btnFmt">24H</button>
         <button class="btn-toggle" id="btnUnit">°C</button>
-        <button class="btn-toggle" id="btnFs">⛶ Full</button>
       </div>
 
       <div class="weather-forecast-strip" id="weatherStrip"></div>
@@ -250,10 +297,10 @@
     </main>
 
     <footer class="bottom-bar">
-      <div class="hubs-grid" id="hubsList"></div>
+      <div class="hubs-vertical-list" id="hubsList"></div>
       <div class="location-card">
         <div class="loc-city">Kirchberg, Luxembourg</div>
-        <div class="loc-tz" id="gmtInfo">GMT+2 (CEST)</div>
+        <div class="loc-tz" id="gmtInfo">GMT+2</div>
       </div>
     </footer>
   </div>
@@ -296,7 +343,6 @@
     function updateMainClock() {
       const now = new Date();
 
-      // Date Top-Left
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const dd = String(now.getDate()).padStart(2, '0');
@@ -304,7 +350,6 @@
       document.getElementById('dateIso').textContent = `${yyyy}-${mm}-${dd}`;
       document.getElementById('dayName').textContent = days[now.getDay()];
 
-      // Main Clock
       let hours = now.getHours();
       const mins = String(now.getMinutes()).padStart(2, '0');
       const secs = String(now.getSeconds()).padStart(2, '0');
@@ -325,7 +370,6 @@
       ampmEl.textContent = ampm;
       ampmEl.style.display = !state.use24Hour ? 'inline' : 'none';
 
-      // GMT / Local TZ info
       const offsetMinutes = -now.getTimezoneOffset();
       const offsetHours = offsetMinutes / 60;
       const sign = offsetHours >= 0 ? '+' : '';
@@ -357,26 +401,50 @@
         }
 
         const dayDiff = day - now.getDate();
-        let offsetTag = '';
-        if (dayDiff === 1 || dayDiff < -25) offsetTag = '+1d';
-        if (dayDiff === -1 || dayDiff > 25) offsetTag = '-1d';
+        const isNextDay = (dayDiff === 1 || dayDiff < -25);
+        const isPrevDay = (dayDiff === -1 || dayDiff > 25);
 
-        return { ...hub, minutesTotal: h * 60 + m, formattedTime, offsetTag };
-      }).sort((a, b) => a.minutesTotal - b.minutesTotal);
+        let offsetTag = '';
+        let dayOrder = 0; // 0 = same day, 1 = next day (+1d), -1 = previous day (-1d)
+        if (isNextDay) {
+          offsetTag = '+1d';
+          dayOrder = 1;
+        } else if (isPrevDay) {
+          offsetTag = '-1d';
+          dayOrder = -1;
+        }
+
+        return {
+          ...hub,
+          minutesTotal: h * 60 + m,
+          dayOrder,
+          formattedTime,
+          offsetTag
+        };
+      }).sort((a, b) => {
+        // Same-day comes first (dayOrder: 0), +1d comes last (dayOrder: 1)
+        if (a.dayOrder !== b.dayOrder) {
+          return a.dayOrder - b.dayOrder;
+        }
+        // Within the same day group, sort chronologically
+        return a.minutesTotal - b.minutesTotal;
+      });
 
       const hubsContainer = document.getElementById('hubsList');
       hubsContainer.innerHTML = sorted.map(h => `
         <div class="hub-pill">
           <span class="hub-name">${h.name}</span>
-          <span class="hub-time">${h.formattedTime}</span>
-          ${h.offsetTag ? `<span class="hub-day-offset">${h.offsetTag}</span>` : ''}
+          <div class="hub-time-box">
+            <span class="hub-time">${h.formattedTime}</span>
+            ${h.offsetTag ? `<span class="hub-day-offset">${h.offsetTag}</span>` : ''}
+          </div>
         </div>
       `).join('');
     }
 
     function renderWeather() {
       const mock = [
-        { h: 'Now', c: 22, p: 0, icon: '🌤️' },
+        { h: 'Now', c: 22, p: 0, icon: '🌤️️' },
         { h: '+1h', c: 21, p: 0, icon: '⛅' },
         { h: '+2h', c: 20, p: 10, icon: '🌥️' },
         { h: '+3h', c: 19, p: 15, icon: '☁️' },
@@ -398,7 +466,6 @@
       }).join('');
     }
 
-    // Toggle controls
     document.getElementById('themeMachine').onclick = () => { state.theme = 'machine'; applyTheme(); };
     document.getElementById('themeLight').onclick = () => { state.theme = 'light'; applyTheme(); };
     document.getElementById('themeDark').onclick = () => { state.theme = 'dark'; applyTheme(); };
@@ -423,21 +490,6 @@
       renderWeather();
     };
 
-    // Fullscreen trigger (handles Google Sites iframe restriction gracefully)
-    document.getElementById('btnFs').onclick = () => {
-      try {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {
-            alert("Google Sites restricts fullscreen inside its page frame.\n\nTip: Press F11 in your browser or open the embed link directly in a tab for true full screen!");
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      } catch (e) {
-        alert("Google Sites restricts fullscreen inside its frame. Press F11 for full screen.");
-      }
-    };
-
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (state.theme === 'machine') applyTheme();
     });
@@ -452,3 +504,5 @@
   </script>
 </body>
 </html>
+
+```
