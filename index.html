@@ -182,7 +182,7 @@
       background: rgba(255,255,255,0.06);
     }
 
-    /* CENTER CLOCK */
+    /* CENTER CLOCK (Doubled font scale) */
     .center-clock-stage {
       position: absolute;
       inset: 0;
@@ -193,7 +193,7 @@
       z-index: 1;
     }
     .clock-digits {
-      font-size: clamp(4rem, 18vw, 17rem);
+      font-size: clamp(8rem, 36vw, 34rem);
       font-weight: 900;
       letter-spacing: -0.04em;
       line-height: 0.85;
@@ -301,7 +301,7 @@
         position: relative;
         margin: 1.2rem 0;
       }
-      .clock-digits { font-size: clamp(3.5rem, 15vw, 6.5rem); }
+      .clock-digits { font-size: clamp(7rem, 30vw, 13rem); }
     }
   </style>
 </head>
@@ -472,8 +472,7 @@
       { "description": "TRON", "proName": "BINANCE:TRXUSDT" },
       { "description": "Sui", "proName": "BINANCE:SUIUSDT" },
       { "description": "NEAR", "proName": "BINANCE:NEARUSDT" },
-      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" },
-      { "description": "Toncoin", "proName": "BINANCE:TONUSDT" }
+      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" }
     ];
 
     let state = {
