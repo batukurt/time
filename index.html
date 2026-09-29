@@ -389,6 +389,7 @@
         <span class="loc-tz" id="gmtInfo">GMT+2</span>
       </div>
 
+      <!-- Weather Forecast Strip: Expanded to 8 Hours -->
       <div class="weather-forecast-strip" id="weatherStrip"></div>
 
       <div class="controls-container">
@@ -449,7 +450,6 @@
   </div>
 
   <script>
-    // 16 Curated Global Hubs (Seoul, Frankfurt, Zurich, and Paris removed)
     const HUBS = [
       { name: "San Francisco", zone: "America/Los_Angeles" },
       { name: "Chicago", zone: "America/Chicago" },
@@ -759,11 +759,12 @@
         let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourISO));
         if (startIndex === -1) startIndex = 0;
 
-        const next6Hours = [];
-        for (let i = 0; i < 6; i++) {
+        // Fetch 8 consecutive hours (current + next 7)
+        const next8Hours = [];
+        for (let i = 0; i < 8; i++) {
           const idx = startIndex + i;
           if (idx < data.hourly.time.length) {
-            next6Hours.push({
+            next8Hours.push({
               tempC: data.hourly.temperature_2m[idx],
               pop: data.hourly.precipitation_probability[idx] || 0,
               icon: getWeatherIcon(data.hourly.weather_code[idx])
@@ -771,7 +772,7 @@
           }
         }
 
-        state.weatherData = next6Hours;
+        state.weatherData = next8Hours;
         renderWeatherStrip();
       } catch (e) {}
     }
