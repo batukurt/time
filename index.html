@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Time & Financial Markets Dashboard</title>
+  <title>Time</title>
   <style>
     :root {
       --bg-color: #000000;
@@ -329,7 +329,7 @@
           <button class="btn-toggle active" id="btnFmt">24H</button>
           <button class="btn-toggle" id="btnUnit">°C</button>
           <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
-          <button class="btn-toggle active" id="btnData">Markets: On</button>
+          <button class="btn-toggle" id="btnData">Markets: Off</button>
         </div>
       </div>
     </header>
@@ -346,11 +346,12 @@
       </div>
     </main>
 
-    <!-- Bottom Container: Ordered World Hubs + 5 Curated Market Rows -->
+    <!-- Bottom Container: 20 World Hubs + 5 Curated Market Rows -->
     <footer class="bottom-container">
       <div class="hubs-tape" id="timesTape"></div>
 
-      <div class="tv-multi-stack" id="tvMultiStack">
+      <!-- Hidden by default -->
+      <div class="tv-multi-stack" id="tvMultiStack" style="display: none;">
         <!-- 1. Currencies -->
         <div class="tv-row-card" id="tvCurrencies"></div>
         <!-- 2. Stock Exchanges -->
@@ -390,7 +391,7 @@
       { name: "Sydney", zone: "Australia/Sydney" }
     ];
 
-    // 1. Currencies: Core requested pairs + premier global FX pairs to fill width without looping
+    // 1. Currencies
     const TV_CURRENCIES = [
       { "description": "EUR / TRY", "proName": "FX_IDC:EURTRY" },
       { "description": "USD / TRY", "proName": "FX_IDC:USDTRY" },
@@ -408,7 +409,7 @@
       { "description": "USD / CAD", "proName": "FX:USDCAD" }
     ];
 
-    // 2. Stock Indices: Core requested benchmarks + major regional indexes
+    // 2. Stock Indices
     const TV_INDICES = [
       { "description": "S&P 500", "proName": "FOREXCOM:SPXUSD" },
       { "description": "NASDAQ 100", "proName": "FOREXCOM:NSXUSD" },
@@ -424,7 +425,7 @@
       { "description": "AEX Index", "proName": "FOREXCOM:NETH25" }
     ];
 
-    // 3. Metals: Core requested tickers + global currency spot benchmarks
+    // 3. Metals
     const TV_METALS = [
       { "description": "Gold (USD/oz)", "proName": "TVC:GOLD" },
       { "description": "Silver (USD/oz)", "proName": "TVC:SILVER" },
@@ -440,7 +441,7 @@
       { "description": "Gold (AUD)", "proName": "OANDA:XAUAUD" }
     ];
 
-    // 4. Commodities: Core energy & agriculture tickers + active liquid commodity funds
+    // 4. Commodities
     const TV_COMMODITIES = [
       { "description": "Brent Crude", "proName": "TVC:UKOIL" },
       { "description": "WTI Crude", "proName": "TVC:USOIL" },
@@ -456,7 +457,7 @@
       { "description": "Agriculture Fund", "proName": "AMEX:DBA" }
     ];
 
-    // 5. Coins: Core requested coins + top liquid crypto assets
+    // 5. Coins
     const TV_CRYPTO = [
       { "description": "Bitcoin", "proName": "BINANCE:BTCUSDT" },
       { "description": "Ethereum", "proName": "BINANCE:ETHUSDT" },
@@ -471,7 +472,8 @@
       { "description": "TRON", "proName": "BINANCE:TRXUSDT" },
       { "description": "Sui", "proName": "BINANCE:SUIUSDT" },
       { "description": "NEAR", "proName": "BINANCE:NEARUSDT" },
-      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" }
+      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" },
+      { "description": "Toncoin", "proName": "BINANCE:TONUSDT" }
     ];
 
     let state = {
@@ -479,7 +481,7 @@
       showSeconds: false,
       use24Hour: true,
       tempUnit: 'C',
-      showMarkets: true,
+      showMarkets: false,
       userLat: null,
       userLon: null,
       weatherData: null
@@ -521,7 +523,7 @@
       renderTvRow('tvCurrencies', TV_CURRENCIES, resolvedTheme);
       renderTvRow('tvIndices', TV_INDICES, resolvedTheme);
       renderTvRow('tvMetals', TV_METALS, resolvedTheme);
-      renderTvRow('tvCommodITIES' in window ? 'tvCommodITIES' : 'tvCommodities', TV_COMMODITIES, resolvedTheme);
+      renderTvRow('tvCommodities', TV_COMMODITIES, resolvedTheme);
       renderTvRow('tvCrypto', TV_CRYPTO, resolvedTheme);
     }
 
@@ -606,7 +608,6 @@
       `).join('');
     }
 
-    // WMO Weather Code to Visual Emoji
     function getWeatherIcon(code) {
       if (code === 0) return '☀️';
       if (code === 1 || code === 2) return '🌤️';
@@ -721,7 +722,6 @@
             }
           }
         } catch (e) {}
-        // Fallback default coordinates (Luxembourg)
         setLocationLabel("Kirchberg", "Luxembourg");
         await fetchLiveWeather(49.6266, 6.1581);
       };
@@ -784,7 +784,7 @@
       if (state.userLat && state.userLon) {
         fetchLiveWeather(state.userLat, state.userLon);
       }
-    }, 900000); // Refresh weather every 15 minutes
+    }, 900000);
   </script>
 </body>
 </html>
