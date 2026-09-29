@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time & Market Hubs Dashboard</title>
+  <title>Time</title>
   <style>
     :root {
       --bg-color: #000000;
@@ -14,6 +15,8 @@
       --lux-red: #D94848;
       --lux-white: #FFFFFF;
       --lux-blue: #3AAFE3;
+      --stock-green: #34d399;
+      --stock-red: #f87171;
     }
 
     [data-theme="light"] {
@@ -25,6 +28,8 @@
       --lux-red: #c93b3b;
       --lux-white: #0f172a;
       --lux-blue: #2395cb;
+      --stock-green: #059669;
+      --stock-red: #dc2626;
     }
 
     * {
@@ -87,7 +92,7 @@
       letter-spacing: 2px;
     }
 
-    /* Center Stage: Main Clock (-30% scaled) */
+    /* Center Stage: Main Clock (-30% size) */
     .center-clock-stage {
       position: absolute;
       inset: 0;
@@ -149,11 +154,11 @@
       pointer-events: auto;
     }
 
-    /* Left: Vertically Stacked Hubs */
+    /* Left: Vertically Stacked Hubs with Stock Badges */
     .hubs-vertical-list {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 7px;
       max-height: 52vh;
       overflow-y: auto;
       padding-right: 9px;
@@ -171,34 +176,45 @@
     .hub-pill {
       background: var(--card-bg);
       border: 1.5px solid var(--card-border);
-      border-radius: 9px;
-      padding: 5px 15px;
+      border-radius: 10px;
+      padding: 7px 16px;
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      gap: 22px;
-      font-size: 1.08rem;
-      min-width: 295px;
+      gap: 18px;
+      font-size: 1.05rem;
+      min-width: 440px;
+    }
+    .hub-name-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
     }
     .hub-name {
       color: var(--text-muted);
       font-weight: 500;
-      flex: 1;
+    }
+    .hub-ticker {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      opacity: 0.75;
+      font-weight: 600;
     }
     .hub-time-box {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 9px;
+      gap: 12px;
     }
     .hub-day-offset-slot {
-      width: 38px;
+      width: 32px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .hub-day-offset {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--lux-blue);
       font-weight: 700;
       background: rgba(58, 175, 227, 0.14);
@@ -210,8 +226,37 @@
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: var(--text-main);
-      min-width: 62px;
+      min-width: 60px;
       text-align: right;
+    }
+    .hub-market-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      font-size: 0.88rem;
+      font-variant-numeric: tabular-nums;
+      min-width: 135px;
+      justify-content: flex-end;
+    }
+    .stock-close {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .stock-chg {
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .stock-up {
+      color: var(--stock-green);
+    }
+    .stock-down {
+      color: var(--stock-red);
     }
 
     /* Right Stack */
@@ -301,7 +346,7 @@
       </div>
     </header>
 
-    <!-- Main Clock Stage (-30% Size) -->
+    <!-- Main Clock Stage -->
     <main class="center-clock-stage">
       <div class="clock-digits">
         <span id="mainHours" class="clock-hours">00</span>
@@ -315,7 +360,7 @@
 
     <!-- Bottom Row -->
     <div class="bottom-row">
-      <!-- Vertically Stacked Hubs -->
+      <!-- 5 Selected Hubs with Times & Stock Closing + % -->
       <div class="hubs-vertical-list" id="hubsList"></div>
 
       <!-- Right Column: Controls, Weather, Location Stacked -->
@@ -344,19 +389,48 @@
   </div>
 
   <script>
+    // Only the 5 requested financial hubs with their primary benchmark exchange closing info
     const HUBS = [
-      { name: "Dublin", zone: "Europe/Dublin" },
-      { name: "London", zone: "Europe/London" },
-      { name: "Frankfurt", zone: "Europe/Berlin" },
-      { name: "Zurich", zone: "Europe/Zurich" },
-      { name: "Istanbul", zone: "Europe/Istanbul" },
-      { name: "New York", zone: "America/New_York" },
-      { name: "Chicago", zone: "America/Chicago" },
-      { name: "Cayman Islands", zone: "America/Cayman" },
-      { name: "Singapore", zone: "Asia/Singapore" },
-      { name: "Hong Kong", zone: "Asia/Hong_Kong" },
-      { name: "Tokyo", zone: "Asia/Tokyo" },
-      { name: "Sydney", zone: "Australia/Sydney" }
+      {
+        name: "Cayman Islands",
+        zone: "America/Cayman",
+        ticker: "CSX",
+        close: "1,248.50",
+        chg: "+0.15%",
+        up: true
+      },
+      {
+        name: "New York",
+        zone: "America/New_York",
+        ticker: "S&P 500",
+        close: "5,864.67",
+        chg: "+0.42%",
+        up: true
+      },
+      {
+        name: "Dublin",
+        zone: "Europe/Dublin",
+        ticker: "ISEQ 20",
+        close: "9,642.10",
+        chg: "-0.28%",
+        up: false
+      },
+      {
+        name: "London",
+        zone: "Europe/London",
+        ticker: "FTSE 100",
+        close: "8,276.45",
+        chg: "+0.31%",
+        up: true
+      },
+      {
+        name: "Istanbul",
+        zone: "Europe/Istanbul",
+        ticker: "BIST 100",
+        close: "9,780.20",
+        chg: "-0.64%",
+        up: false
+      }
     ];
 
     let state = {
@@ -473,12 +547,21 @@
       const hubsContainer = document.getElementById('hubsList');
       hubsContainer.innerHTML = sorted.map(h => `
         <div class="hub-pill">
-          <span class="hub-name">${h.name}</span>
+          <div class="hub-name-group">
+            <span class="hub-name">${h.name}</span>
+            <span class="hub-ticker">${h.ticker}</span>
+          </div>
           <div class="hub-time-box">
-            <span class="hub-day-offset-slot">
+            <div class="hub-day-offset-slot">
               ${h.offsetTag ? `<span class="hub-day-offset">${h.offsetTag}</span>` : ''}
-            </span>
+            </div>
             <span class="hub-time">${h.formattedTime}</span>
+            <div class="hub-market-badge">
+              <span class="stock-close">${h.close}</span>
+              <span class="stock-chg ${h.up ? 'stock-up' : 'stock-down'}">
+                ${h.up ? '▲' : '▼'}${h.chg}
+              </span>
+            </div>
           </div>
         </div>
       `).join('');
@@ -559,3 +642,5 @@
   </script>
 </body>
 </html>
+
+```
