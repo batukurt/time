@@ -182,10 +182,7 @@
       display: block;
     }
 
-    /* 
-      CENTER CLOCK STAGE
-      Fixed spatial frame that never moves when market rows toggle
-    */
+    /* CENTER CLOCK STAGE: Position-Locked */
     .center-clock-stage {
       position: absolute;
       top: 155px;
@@ -199,14 +196,6 @@
       z-index: 1;
     }
 
-    /* 
-      ZERO-SHIFT CLOCK ARCHITECTURE:
-      The container has a 100% width relative origin.
-      The colon is pinned at 50% horizontal center.
-      Hours are positioned to the left of 50%.
-      Minutes are positioned to the right of 50%.
-      Seconds and AM/PM are placed outside without pushing the hours or minutes.
-    */
     .clock-stage-inner {
       position: relative;
       width: 100%;
@@ -259,7 +248,7 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Trailing seconds & AM/PM: Anchored after minutes, completely decoupled from layout */
+    /* Trailing seconds & AM/PM decoupled from layout */
     .clock-trailing-anchor {
       position: absolute;
       left: calc(100% + 0.08em);
@@ -312,12 +301,15 @@
       pointer-events: auto;
     }
 
+    /* Centered World Hubs Tape */
     .hubs-tape {
       display: flex;
+      justify-content: center;
       gap: 6px;
       overflow-x: auto;
       scrollbar-width: none;
       padding-bottom: 2px;
+      width: 100%;
     }
     .hubs-tape::-webkit-scrollbar { display: none; }
 
@@ -365,6 +357,7 @@
       body { overflow-y: auto; }
       .dashboard { height: auto; min-height: 100dvh; }
       .controls-container { flex-wrap: wrap; justify-content: center; }
+      .hubs-tape { justify-content: flex-start; }
       .center-clock-stage {
         position: relative;
         top: auto;
@@ -456,6 +449,7 @@
   </div>
 
   <script>
+    // 16 Curated Global Hubs (Seoul, Frankfurt, Zurich, and Paris removed)
     const HUBS = [
       { name: "San Francisco", zone: "America/Los_Angeles" },
       { name: "Chicago", zone: "America/Chicago" },
@@ -464,17 +458,13 @@
       { name: "São Paulo", zone: "America/Sao_Paulo" },
       { name: "London", zone: "Europe/London" },
       { name: "Dublin", zone: "Europe/Dublin" },
-      { name: "Paris", zone: "Europe/Paris" },
       { name: "Luxembourg", zone: "Europe/Luxembourg" },
-      { name: "Frankfurt", zone: "Europe/Berlin" },
-      { name: "Zurich", zone: "Europe/Zurich" },
       { name: "Istanbul", zone: "Europe/Istanbul" },
       { name: "Dubai", zone: "Asia/Dubai" },
       { name: "Mumbai", zone: "Asia/Kolkata" },
       { name: "Singapore", zone: "Asia/Singapore" },
       { name: "Hong Kong", zone: "Asia/Hong_Kong" },
       { name: "Shanghai", zone: "Asia/Shanghai" },
-      { name: "Seoul", zone: "Asia/Seoul" },
       { name: "Tokyo", zone: "Asia/Tokyo" },
       { name: "Sydney", zone: "Australia/Sydney" }
     ];
