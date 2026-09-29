@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Time & Market Hubs Dashboard</title>
+  <title>Time</title>
   <style>
     :root {
       --bg-color: #000000;
-      --card-bg: #09090b;
-      --card-border: #222227;
+      --card-bg: #0c0c0e;
+      --card-border: #242429;
+      --row-even: #111115;
+      --row-odd: #08080a;
       --text-main: #ffffff;
       --text-muted: #8e8e99;
       --lux-red: #D94848;
@@ -19,9 +21,11 @@
     }
 
     [data-theme="light"] {
-      --bg-color: #f8fafc;
+      --bg-color: #f4f6f8;
       --card-bg: #ffffff;
       --card-border: #cbd5e1;
+      --row-even: #f1f5f9;
+      --row-odd: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --lux-red: #c93b3b;
@@ -48,11 +52,10 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* Scalable layout container using dynamic viewport units (dvh/dvw) */
     .dashboard {
       min-height: 100dvh;
       width: 100dvw;
-      padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 3.5vw, 3rem);
+      padding: clamp(0.75rem, 1.8vw, 1.5rem) clamp(0.75rem, 2vw, 2rem);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -60,41 +63,134 @@
       overflow-x: hidden;
     }
 
-    /* Top: Centered Date */
+    /* TOP BAR */
     .top-bar {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
       width: 100%;
+      z-index: 10;
     }
 
     .date-badge {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: clamp(8px, 1.5vw, 18px);
+      gap: clamp(8px, 1.2vw, 14px);
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      padding: clamp(6px, 1vw, 9px) clamp(14px, 2vw, 27px);
+      padding: clamp(6px, 0.9vh, 9px) clamp(12px, 1.6vw, 22px);
       border-radius: 9999px;
-      backdrop-filter: blur(8px);
     }
     .date-iso {
-      font-size: clamp(1rem, 2.2vw, 1.75rem);
+      font-size: clamp(0.95rem, 1.4vw, 1.3rem);
       font-weight: 700;
       letter-spacing: 0.5px;
       color: var(--lux-blue);
       font-variant-numeric: tabular-nums;
     }
     .day-name {
-      font-size: clamp(0.75rem, 1.4vw, 1.25rem);
+      font-size: clamp(0.7rem, 0.95vw, 0.9rem);
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1.5px;
     }
 
-    /* Responsive Main Clock: layered seamlessly in background */
+    .top-right-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .weather-forecast-strip {
+      display: flex;
+      gap: clamp(4px, 0.5vw, 6px);
+    }
+    .weather-cell {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: clamp(3px, 0.5vh, 5px) clamp(5px, 0.7vw, 8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: clamp(38px, 4vw, 52px);
+    }
+    .weather-hour {
+      font-size: clamp(0.58rem, 0.7vw, 0.68rem);
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .weather-icon {
+      font-size: clamp(0.72rem, 0.95vw, 0.95rem);
+      margin: 1px 0;
+    }
+    .weather-temp {
+      font-size: clamp(0.68rem, 0.85vw, 0.82rem);
+      font-weight: 700;
+    }
+    .weather-pop {
+      font-size: clamp(0.52rem, 0.68vw, 0.65rem);
+      color: var(--lux-blue);
+      font-weight: 600;
+    }
+
+    .location-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      padding: 4px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .loc-city {
+      font-size: clamp(0.72rem, 0.9vw, 0.88rem);
+      font-weight: 700;
+    }
+    .loc-tz {
+      font-size: clamp(0.64rem, 0.8vw, 0.78rem);
+      color: var(--lux-blue);
+      font-weight: 600;
+    }
+
+    .controls-container {
+      display: flex;
+      gap: 3px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 3px 6px;
+      border-radius: 9999px;
+    }
+
+    .btn-toggle {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 3px 10px;
+      font-size: clamp(0.68rem, 0.85vw, 0.82rem);
+      font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .btn-toggle.active {
+      background: var(--lux-red);
+      color: #ffffff;
+    }
+    .btn-toggle:hover:not(.active) {
+      color: var(--text-main);
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* CENTER STAGE: Giant Clock */
     .center-clock-stage {
       position: absolute;
       inset: 0;
@@ -105,7 +201,7 @@
       z-index: 1;
     }
     .clock-digits {
-      font-size: clamp(4.5rem, 23vw, 24rem);
+      font-size: clamp(5rem, 24vw, 24rem);
       font-weight: 900;
       letter-spacing: -0.04em;
       line-height: 0.85;
@@ -113,18 +209,14 @@
       display: flex;
       align-items: baseline;
     }
-    .clock-hours {
-      color: var(--lux-red);
-    }
+    .clock-hours { color: var(--lux-red); }
     .clock-colon {
       opacity: 0.16;
       margin: 0 0.04em;
       color: var(--text-muted);
       font-weight: 400;
     }
-    .clock-minutes {
-      color: var(--lux-white);
-    }
+    .clock-minutes { color: var(--lux-white); }
     .clock-sec-colon {
       opacity: 0.16;
       color: var(--text-muted);
@@ -146,272 +238,160 @@
       letter-spacing: 1px;
     }
 
-    /* Bottom Section */
-    .bottom-row {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: clamp(1rem, 2.5vw, 3rem);
+    /* BOTTOM STRIP: 6 columns with alternating shaded rows */
+    .market-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: clamp(6px, 0.8vw, 12px);
+      width: 100%;
       z-index: 10;
       pointer-events: auto;
-      width: 100%;
     }
 
-    /* Left: Vertically Stacked Hubs */
-    .hubs-vertical-list {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(4px, 0.8vh, 7px);
-      max-height: 48dvh;
-      overflow-y: auto;
-      padding-right: 6px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--card-border) transparent;
-    }
-    .hubs-vertical-list::-webkit-scrollbar {
-      width: 4px;
-    }
-    .hubs-vertical-list::-webkit-scrollbar-thumb {
-      background: var(--card-border);
-      border-radius: 4px;
-    }
-
-    .hub-pill {
+    .market-col {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: clamp(4px, 0.7vh, 7px) clamp(8px, 1.2vw, 16px);
-      display: inline-flex;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .market-item {
+      display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: clamp(8px, 1.5vw, 18px);
-      font-size: clamp(0.75rem, 1.2vw, 1.05rem);
-      width: clamp(260px, 32vw, 440px);
-    }
-    .hub-name-group {
-      display: flex;
-      align-items: center;
       gap: 6px;
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      height: 27px;
+      padding: 0 9px;
+      font-size: clamp(0.68rem, 0.76vw, 0.82rem);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .hub-name {
+    .market-item:last-child {
+      border-bottom: none;
+    }
+
+    .market-item:nth-child(even) { background: var(--row-even); }
+    .market-item:nth-child(odd) { background: var(--row-odd); }
+
+    .item-label {
       color: var(--text-muted);
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
-    .hub-ticker {
-      font-size: 0.75em;
-      color: var(--text-muted);
-      opacity: 0.75;
-      font-weight: 600;
-    }
-    .hub-time-box {
+
+    .item-val-group {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: clamp(4px, 0.8vw, 10px);
-    }
-    .hub-day-offset-slot {
-      width: 26px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .hub-day-offset {
-      font-size: 0.75em;
-      color: var(--lux-blue);
-      font-weight: 700;
-      background: rgba(58, 175, 227, 0.14);
-      padding: 1px 4px;
-      border-radius: 4px;
-      line-height: 1;
-    }
-    .hub-time {
-      font-weight: 700;
+      gap: 5px;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .item-val {
+      font-weight: 600;
       color: var(--text-main);
-      min-width: 44px;
       text-align: right;
     }
-    .hub-market-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 6px;
-      border-radius: 5px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      font-size: 0.82em;
-      font-variant-numeric: tabular-nums;
-      min-width: 98px;
-      justify-content: flex-end;
-    }
-    .stock-close {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-    .stock-chg {
+
+    .item-chg {
       font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 1px;
+      font-size: 0.88em;
+      min-width: 44px;
+      text-align: right;
     }
     .stock-up { color: var(--stock-green); }
     .stock-down { color: var(--stock-red); }
 
-    /* Right Stack */
-    .right-corner-stack {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: clamp(6px, 1.2vh, 12px);
-    }
-
-    .controls-container {
-      display: flex;
-      gap: 3px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 4px 6px;
-      border-radius: 9999px;
-    }
-
-    .btn-toggle {
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      padding: clamp(4px, 0.7vh, 6px) clamp(8px, 1.1vw, 14px);
-      font-size: clamp(0.72rem, 1.1vw, 1.05rem);
-      font-weight: 600;
-      border-radius: 9999px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-    .btn-toggle.active {
-      background: var(--lux-red);
-      color: #ffffff;
-    }
-    .btn-toggle:hover:not(.active) {
-      color: var(--text-main);
-      background: rgba(255,255,255,0.06);
-    }
-
-    .weather-forecast-strip {
-      display: flex;
-      justify-content: flex-end;
-      gap: clamp(4px, 0.6vw, 8px);
-    }
-    .weather-cell {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 9px;
-      padding: clamp(3px, 0.6vh, 6px) clamp(6px, 0.8vw, 10px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: clamp(46px, 5.5vw, 68px);
-    }
-    .weather-hour {
-      font-size: clamp(0.65rem, 0.95vw, 0.92rem);
-      color: var(--text-muted);
-      font-variant-numeric: tabular-nums;
-      font-weight: 600;
-    }
-    .weather-icon {
-      font-size: clamp(0.85rem, 1.3vw, 1.3rem);
-      margin: 1px 0;
-    }
-    .weather-temp {
-      font-size: clamp(0.75rem, 1.15vw, 1.1rem);
-      font-weight: 700;
-    }
-    .weather-pop {
-      font-size: clamp(0.6rem, 0.9vw, 0.88rem);
+    .hub-offset-badge {
+      font-size: 0.72em;
       color: var(--lux-blue);
-      font-weight: 600;
-    }
-
-    .location-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: clamp(5px, 0.9vh, 9px) clamp(10px, 1.5vw, 20px);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .loc-city {
-      font-size: clamp(0.8rem, 1.3vw, 1.25rem);
+      background: rgba(58, 175, 227, 0.16);
+      padding: 1px 4px;
+      border-radius: 3px;
       font-weight: 700;
-    }
-    .loc-tz {
-      font-size: clamp(0.68rem, 1.1vw, 1.05rem);
-      color: var(--lux-blue);
-      font-weight: 600;
-      margin-top: 2px;
+      line-height: 1;
     }
 
-    /* Phone & Tablet Responsive Overrides */
-    @media (max-width: 860px) {
+    @media (max-width: 1024px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .top-right-group {
+        align-items: flex-start;
+      }
+      .market-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
       .dashboard {
-        padding: 1rem;
-        gap: 1.2rem;
         min-height: auto;
+        gap: 1rem;
+        padding: 0.75rem;
       }
-      .center-clock-stage {
-        position: relative;
-        margin: 1.5rem 0;
-      }
-      .clock-digits {
-        font-size: clamp(4.5rem, 20vw, 8rem);
-      }
-      .bottom-row {
-        flex-direction: column-reverse;
-        align-items: stretch;
-        gap: 1.25rem;
-      }
-      .hubs-vertical-list {
-        max-height: none;
-        width: 100%;
-      }
-      .hub-pill {
-        width: 100%;
-        min-width: unset;
-      }
-      .right-corner-stack {
-        align-items: stretch;
-        width: 100%;
-      }
-      .controls-container {
+      .date-badge {
         justify-content: center;
-        flex-wrap: wrap;
+        width: 100%;
+      }
+      .top-right-group {
+        align-items: stretch;
+        width: 100%;
+      }
+      .location-card, .controls-container {
+        justify-content: center;
       }
       .weather-forecast-strip {
         justify-content: space-between;
-        overflow-x: auto;
-        padding-bottom: 2px;
       }
-      .location-card {
-        text-align: center;
+      .center-clock-stage {
+        position: relative;
+        margin: 1.2rem 0;
+      }
+      .clock-digits {
+        font-size: clamp(4rem, 18vw, 7rem);
+      }
+      .market-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
-    <!-- Top Centered Date -->
+    <!-- Top Bar -->
     <header class="top-bar">
       <div class="date-badge">
         <span class="date-iso" id="dateIso">----.--.--</span>
         <span class="day-name" id="dayName">---</span>
       </div>
+
+      <div class="top-right-group">
+        <div class="weather-forecast-strip" id="weatherStrip"></div>
+        <div class="location-card">
+          <span class="loc-city">Kirchberg, Luxembourg</span>
+          <span class="loc-tz" id="gmtInfo">GMT+2</span>
+        </div>
+        <div class="controls-container">
+          <button class="btn-toggle active" id="themeMachine">Auto</button>
+          <button class="btn-toggle" id="themeLight">Light</button>
+          <button class="btn-toggle" id="themeDark">Dark</button>
+          <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
+          <button class="btn-toggle" id="btnSec">Sec: Off</button>
+          <button class="btn-toggle active" id="btnFmt">24H</button>
+          <button class="btn-toggle" id="btnUnit">°C</button>
+        </div>
+      </div>
     </header>
 
-    <!-- Scalable Center Clock -->
+    <!-- Center Stage -->
     <main class="center-clock-stage">
       <div class="clock-digits">
         <span id="mainHours" class="clock-hours">00</span>
@@ -423,78 +403,84 @@
       </div>
     </main>
 
-    <!-- Bottom Section: Hubs on Left, Stacked Controls on Right -->
-    <div class="bottom-row">
-      <!-- 5 Selected Hubs -->
-      <div class="hubs-vertical-list" id="hubsList"></div>
-
-      <!-- Right Column: Switches, Weather, Location -->
-      <div class="right-corner-stack">
-        <!-- Switches -->
-        <div class="controls-container">
-          <button class="btn-toggle active" id="themeMachine">Auto</button>
-          <button class="btn-toggle" id="themeLight">Light</button>
-          <button class="btn-toggle" id="themeDark">Dark</button>
-          <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
-          <button class="btn-toggle" id="btnSec">Sec: Off</button>
-          <button class="btn-toggle active" id="btnFmt">24H</button>
-          <button class="btn-toggle" id="btnUnit">°C</button>
-        </div>
-
-        <!-- Hourly Weather Strip -->
-        <div class="weather-forecast-strip" id="weatherStrip"></div>
-
-        <!-- Location Card -->
-        <div class="location-card">
-          <div class="loc-city">Kirchberg, Luxembourg</div>
-          <div class="loc-tz" id="gmtInfo">GMT+2</div>
-        </div>
-      </div>
-    </div>
+    <!-- Bottom Strip -->
+    <footer class="market-strip">
+      <div class="market-col" id="timesList"></div>
+      <div class="market-col" id="colIndices"></div>
+      <div class="market-col" id="colCurrencies"></div>
+      <div class="market-col" id="colMetals"></div>
+      <div class="market-col" id="colCommodities"></div>
+      <div class="market-col" id="colCrypto"></div>
+    </footer>
   </div>
 
   <script>
+    // -------------------------------------------------------------
+    // BASELINE MARKET CONFIGURATION
+    // You can adjust any benchmark number or percentage here directly
+    // -------------------------------------------------------------
+    const MARKET_BENCHMARKS = {
+      indices: [
+        { label: "BIST 100", val: "9,780.2", chg: "-0.64%", up: false },
+        { label: "S&P 500", val: "5,864.7", chg: "+0.42%", up: true },
+        { label: "NASDAQ", val: "18,518.6", chg: "+0.63%", up: true },
+        { label: "Shanghai", val: "3,261.5", chg: "+0.52%", up: true },
+        { label: "FTSE 100", val: "8,276.4", chg: "+0.31%", up: true },
+        { label: "DAX 40", val: "19,425.8", chg: "+0.28%", up: true },
+        { label: "Nikkei 225", val: "38,925.6", chg: "-0.18%", up: false },
+        { label: "EuroStoxx", val: "4,942.3", chg: "+0.22%", up: true }
+      ],
+      currencies: [
+        { id: "gauTry", label: "GAU/TRY", val: "3,025.4", chg: "+0.52%", up: true },
+        { id: "eurTry", label: "EUR/TRY", val: "38.45", chg: "+0.22%", up: true },
+        { id: "eurUsd", label: "EUR/USD", val: "1.0850", chg: "-0.14%", up: false },
+        { id: "eurGbp", label: "EUR/GBP", val: "0.8340", chg: "+0.08%", up: true },
+        { id: "eurChf", label: "EUR/CHF", val: "0.9385", chg: "-0.05%", up: false },
+        { id: "eurJpy", label: "EUR/JPY", val: "164.20", chg: "+0.35%", up: true },
+        { id: "eurAud", label: "EUR/AUD", val: "1.6210", chg: "-0.18%", up: false },
+        { id: "usdTry", label: "USD/TRY", val: "35.42", chg: "+0.15%", up: true }
+      ],
+      metals: [
+        { label: "Gold (oz)", val: "$2,658.4", chg: "+0.48%", up: true },
+        { label: "Silver (oz)", val: "$31.85", chg: "+1.12%", up: true },
+        { label: "Platinum", val: "$985.2", chg: "-0.32%", up: false },
+        { label: "Palladium", val: "$1,024.5", chg: "-0.85%", up: false },
+        { label: "Rhodium", val: "$4,750.0", chg: "+0.15%", up: true },
+        { label: "Steel (HRC)", val: "$720.0", chg: "-0.40%", up: false },
+        { label: "Copper (lb)", val: "$4.38", chg: "+0.38%", up: true },
+        { label: "Aluminium", val: "$2,610.0", chg: "+0.25%", up: true }
+      ],
+      commodities: [
+        { label: "Brent Crude", val: "$74.25", chg: "+0.65%", up: true },
+        { label: "WTI Crude", val: "$70.60", chg: "+0.72%", up: true },
+        { label: "Natural Gas", val: "$2.85", chg: "-1.40%", up: false },
+        { label: "Iron Ore", val: "$105.20", chg: "-0.30%", up: false },
+        { label: "Wheat", val: "$582.50", chg: "-0.45%", up: false },
+        { label: "Corn", val: "$415.00", chg: "+0.22%", up: true },
+        { label: "Coffee", val: "$252.40", chg: "+1.15%", up: true },
+        { label: "Cotton", val: "$72.80", chg: "-0.20%", up: false }
+      ],
+      crypto: [
+        { id: "bitcoin", label: "Bitcoin", val: "$64,350", chg: "+1.85%", up: true },
+        { id: "ethereum", label: "Ethereum", val: "$2,640", chg: "+1.20%", up: true },
+        { id: "solana", label: "Solana", val: "$154.20", chg: "-0.92%", up: false },
+        { id: "binancecoin", label: "BNB", val: "$595.40", chg: "+0.45%", up: true },
+        { id: "ripple", label: "XRP", val: "$0.584", chg: "-0.35%", up: false },
+        { id: "cardano", label: "Cardano", val: "$0.352", chg: "+0.50%", up: true },
+        { id: "avalanche-2", label: "Avalanche", val: "$27.80", chg: "-0.60%", up: false },
+        { id: "dogecoin", label: "Dogecoin", val: "$0.114", chg: "+0.80%", up: true }
+      ]
+    };
+
     const HUBS = [
-      {
-        name: "Cayman Islands",
-        zone: "America/Cayman",
-        ticker: "CSX",
-        close: "1,248.50",
-        chg: "+0.15%",
-        up: true
-      },
-      {
-        name: "New York",
-        zone: "America/New_York",
-        ticker: "S&P 500",
-        close: "5,864.67",
-        chg: "+0.42%",
-        up: true
-      },
-      {
-        name: "Dublin",
-        zone: "Europe/Dublin",
-        ticker: "ISEQ 20",
-        close: "9,642.10",
-        chg: "-0.28%",
-        up: false
-      },
-      {
-        name: "London",
-        zone: "Europe/London",
-        ticker: "FTSE 100",
-        close: "8,276.45",
-        chg: "+0.31%",
-        up: true
-      },
-      {
-        name: "Istanbul",
-        zone: "Europe/Istanbul",
-        ticker: "BIST 100",
-        close: "9,780.20",
-        chg: "-0.64%",
-        up: false
-      }
+      { name: "Cayman Is.", zone: "America/Cayman" },
+      { name: "New York", zone: "America/New_York" },
+      { name: "London", zone: "Europe/London" },
+      { name: "Dublin", zone: "Europe/Dublin" },
+      { name: "Istanbul", zone: "Europe/Istanbul" },
+      { name: "Hong Kong", zone: "Asia/Hong_Kong" },
+      { name: "Tokyo", zone: "Asia/Tokyo" },
+      { name: "Sydney", zone: "Australia/Sydney" }
     ];
 
     let state = {
@@ -503,6 +489,30 @@
       use24Hour: true,
       tempUnit: 'C'
     };
+
+    function renderColumn(containerId, items) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = items.map(item => `
+        <div class="market-item">
+          <span class="item-label">${item.label}</span>
+          <div class="item-val-group">
+            <span class="item-val" id="val_${item.id || item.label}">${item.val}</span>
+            <span class="item-chg ${item.up ? 'stock-up' : 'stock-down'}" id="chg_${item.id || item.label}">
+              ${item.up ? '▲' : '▼'}${item.chg.replace(/^[+-]/, '')}
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAllColumns() {
+      renderColumn('colIndices', MARKET_BENCHMARKS.indices);
+      renderColumn('colCurrencies', MARKET_BENCHMARKS.currencies);
+      renderColumn('colMetals', MARKET_BENCHMARKS.metals);
+      renderColumn('colCommodities', MARKET_BENCHMARKS.commodities);
+      renderColumn('colCrypto', MARKET_BENCHMARKS.crypto);
+    }
 
     function applyTheme() {
       if (state.theme === 'machine') {
@@ -518,7 +528,6 @@
 
     function updateMainClock() {
       const now = new Date();
-
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const dd = String(now.getDate()).padStart(2, '0');
@@ -553,10 +562,10 @@
       const offsetMinutes = -now.getTimezoneOffset();
       const offsetHours = offsetMinutes / 60;
       const sign = offsetHours >= 0 ? '+' : '';
-      document.getElementById('gmtInfo').textContent = `(GMT${sign}${offsetHours})`;
+      document.getElementById('gmtInfo').textContent = `GMT${sign}${offsetHours}`;
     }
 
-    function updateHubs() {
+    function updateHubTimes() {
       const now = new Date();
       const sorted = HUBS.map(hub => {
         const parts = new Intl.DateTimeFormat('en-US', {
@@ -581,51 +590,24 @@
         }
 
         const dayDiff = day - now.getDate();
-        const isNextDay = (dayDiff === 1 || dayDiff < -25);
-        const isPrevDay = (dayDiff === -1 || dayDiff > 25);
-
         let offsetTag = '';
         let dayOrder = 0;
-        if (isNextDay) {
-          offsetTag = '+1d';
-          dayOrder = 1;
-        } else if (isPrevDay) {
-          offsetTag = '-1d';
-          dayOrder = -1;
-        }
+        if (dayDiff === 1 || dayDiff < -25) { offsetTag = '+1d'; dayOrder = 1; }
+        else if (dayDiff === -1 || dayDiff > 25) { offsetTag = '-1d'; dayOrder = -1; }
 
-        return {
-          ...hub,
-          minutesTotal: h * 60 + m,
-          dayOrder,
-          formattedTime,
-          offsetTag
-        };
+        return { ...hub, minutesTotal: h * 60 + m, dayOrder, formattedTime, offsetTag };
       }).sort((a, b) => {
-        if (a.dayOrder !== b.dayOrder) {
-          return a.dayOrder - b.dayOrder;
-        }
+        if (a.dayOrder !== b.dayOrder) return a.dayOrder - b.dayOrder;
         return a.minutesTotal - b.minutesTotal;
       });
 
-      const hubsContainer = document.getElementById('hubsList');
-      hubsContainer.innerHTML = sorted.map(h => `
-        <div class="hub-pill">
-          <div class="hub-name-group">
-            <span class="hub-name">${h.name}</span>
-            <span class="hub-ticker">${h.ticker}</span>
-          </div>
-          <div class="hub-time-box">
-            <div class="hub-day-offset-slot">
-              ${h.offsetTag ? `<span class="hub-day-offset">${h.offsetTag}</span>` : ''}
-            </div>
-            <span class="hub-time">${h.formattedTime}</span>
-            <div class="hub-market-badge">
-              <span class="stock-close">${h.close}</span>
-              <span class="stock-chg ${h.up ? 'stock-up' : 'stock-down'}">
-                ${h.up ? '▲' : '▼'}${h.chg}
-              </span>
-            </div>
+      const listContainer = document.getElementById('timesList');
+      listContainer.innerHTML = sorted.map(h => `
+        <div class="market-item">
+          <span class="item-label">${h.name}</span>
+          <div class="item-val-group">
+            ${h.offsetTag ? `<span class="hub-offset-badge">${h.offsetTag}</span>` : ''}
+            <span class="item-val">${h.formattedTime}</span>
           </div>
         </div>
       `).join('');
@@ -634,7 +616,6 @@
     function renderWeather() {
       const now = new Date();
       const currentH = now.getHours();
-
       const weatherIcons = ['🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️'];
       const temps = [22, 21, 20, 19, 18, 17];
       const pops = [0, 0, 10, 15, 25, 40];
@@ -666,6 +647,67 @@
       }).join('');
     }
 
+    // Dynamic Live Currency & Gold Sync
+    async function syncLiveForex() {
+      try {
+        const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=TRY,USD,GBP,CHF,JPY,AUD');
+        if (!res.ok) return;
+        const data = await res.json();
+        const r = data.rates;
+
+        const updateVal = (id, text) => {
+          const el = document.getElementById(`val_${id}`);
+          if (el) el.textContent = text;
+        };
+
+        if (r.TRY) updateVal('eurTry', r.TRY.toFixed(2));
+        if (r.USD) updateVal('eurUsd', r.USD.toFixed(4));
+        if (r.GBP) updateVal('eurGbp', r.GBP.toFixed(4));
+        if (r.CHF) updateVal('eurChf', r.CHF.toFixed(4));
+        if (r.JPY) updateVal('eurJpy', r.JPY.toFixed(1));
+        if (r.AUD) updateVal('eurAud', r.AUD.toFixed(3));
+
+        if (r.USD && r.TRY) {
+          const usdTry = r.TRY / r.USD;
+          updateVal('usdTry', usdTry.toFixed(2));
+          const gauTry = (2658.4 / 31.1034768) * usdTry;
+          updateVal('gauTry', gauTry.toLocaleString('en-US', { maximumFractionDigits: 1 }));
+        }
+      } catch (e) {}
+    }
+
+    // Dynamic Live Crypto Sync
+    async function syncLiveCrypto() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple,cardano,avalanche-2,dogecoin&vs_currencies=usd&include_24hr_change=true');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const updateItem = (id, isDec) => {
+          if (!data[id]) return;
+          const price = data[id].usd;
+          const chg = data[id].usd_24h_change || 0;
+          const valEl = document.getElementById(`val_${id}`);
+          const chgEl = document.getElementById(`chg_${id}`);
+          if (valEl) valEl.textContent = isDec ? `$${price.toFixed(3)}` : `$${price.toLocaleString()}`;
+          if (chgEl) {
+            chgEl.textContent = `${chg >= 0 ? '▲' : '▼'}${Math.abs(chg).toFixed(1)}%`;
+            chgEl.className = `item-chg ${chg >= 0 ? 'stock-up' : 'stock-down'}`;
+          }
+        };
+
+        updateItem('bitcoin', false);
+        updateItem('ethereum', false);
+        updateItem('solana', false);
+        updateItem('binancecoin', false);
+        updateItem('ripple', true);
+        updateItem('cardano', true);
+        updateItem('avalanche-2', false);
+        updateItem('dogecoin', true);
+      } catch (e) {}
+    }
+
+    // Toggle controls
     document.getElementById('themeMachine').onclick = () => { state.theme = 'machine'; applyTheme(); };
     document.getElementById('themeLight').onclick = () => { state.theme = 'light'; applyTheme(); };
     document.getElementById('themeDark').onclick = () => { state.theme = 'dark'; applyTheme(); };
@@ -681,7 +723,7 @@
       state.use24Hour = !state.use24Hour;
       document.getElementById('btnFmt').textContent = state.use24Hour ? '24H' : '12H';
       updateMainClock();
-      updateHubs();
+      updateHubTimes();
       renderWeather();
     };
 
@@ -695,14 +737,20 @@
       if (state.theme === 'machine') applyTheme();
     });
 
+    // Initialize
     applyTheme();
     updateMainClock();
-    updateHubs();
+    updateHubTimes();
     renderWeather();
+    renderAllColumns();
+    syncLiveForex();
+    syncLiveCrypto();
 
     setInterval(updateMainClock, 1000);
-    setInterval(updateHubs, 10000);
+    setInterval(updateHubTimes, 10000);
     setInterval(renderWeather, 60000);
+    setInterval(syncLiveForex, 60000);
+    setInterval(syncLiveCrypto, 60000);
   </script>
 </body>
 </html>
