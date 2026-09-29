@@ -37,30 +37,29 @@
 
     html, body {
       width: 100%;
-      min-height: 100%;
+      height: 100%;
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
       transition: background-color 0.3s ease, color 0.3s ease;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     .dashboard {
-      min-height: 100dvh;
+      height: 100dvh;
       width: 100dvw;
       padding: clamp(0.5rem, 1.2vw, 1rem) clamp(0.75rem, 2vw, 1.8rem);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       position: relative;
     }
 
-    /* TOP BAR */
-    .top-bar {
+    /* TOP CENTER STACK */
+    .top-center-container {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1.5rem;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
       width: 100%;
       z-index: 10;
     }
@@ -71,7 +70,7 @@
       gap: clamp(8px, 1.2vw, 14px);
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      padding: clamp(5px, 0.8vh, 8px) clamp(12px, 1.6vw, 20px);
+      padding: clamp(4px, 0.7vh, 7px) clamp(14px, 1.8vw, 22px);
       border-radius: 9999px;
     }
     .date-iso {
@@ -89,11 +88,24 @@
       letter-spacing: 1.5px;
     }
 
-    .top-right-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 5px;
+    .location-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      padding: 3px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .loc-city {
+      font-size: clamp(0.7rem, 0.85vw, 0.84rem);
+      font-weight: 700;
+    }
+    .loc-tz {
+      font-size: clamp(0.62rem, 0.78vw, 0.75rem);
+      color: var(--lux-blue);
+      font-weight: 600;
     }
 
     .weather-forecast-strip {
@@ -130,28 +142,9 @@
       font-weight: 600;
     }
 
-    .location-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 9999px;
-      padding: 3px 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .loc-city {
-      font-size: clamp(0.7rem, 0.85vw, 0.84rem);
-      font-weight: 700;
-    }
-    .loc-tz {
-      font-size: clamp(0.62rem, 0.78vw, 0.75rem);
-      color: var(--lux-blue);
-      font-weight: 600;
-    }
-
     .controls-container {
       display: flex;
+      align-items: center;
       gap: 3px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -170,6 +163,7 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       transition: all 0.2s ease;
       touch-action: manipulation;
     }
@@ -181,66 +175,143 @@
       color: var(--text-main);
       background: rgba(255,255,255,0.06);
     }
+    .btn-icon {
+      padding: 3px 7px;
+    }
+    .btn-icon svg {
+      display: block;
+    }
 
-    /* CENTER CLOCK (Doubled font scale) */
+    /* 
+      CENTER CLOCK STAGE
+      Fixed spatial frame that never moves when market rows toggle
+    */
     .center-clock-stage {
       position: absolute;
-      inset: 0;
+      top: 155px;
+      bottom: 310px;
+      left: 0;
+      right: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       pointer-events: none;
       z-index: 1;
     }
-    .clock-digits {
-      font-size: clamp(8rem, 36vw, 34rem);
+
+    /* 
+      ZERO-SHIFT CLOCK ARCHITECTURE:
+      The container has a 100% width relative origin.
+      The colon is pinned at 50% horizontal center.
+      Hours are positioned to the left of 50%.
+      Minutes are positioned to the right of 50%.
+      Seconds and AM/PM are placed outside without pushing the hours or minutes.
+    */
+    .clock-stage-inner {
+      position: relative;
+      width: 100%;
+      height: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(6.5rem, min(24vw, calc((100dvh - 465px) * 0.94)), 26rem);
       font-weight: 900;
       letter-spacing: -0.04em;
-      line-height: 0.85;
+      line-height: 1;
       font-variant-numeric: tabular-nums;
-      display: flex;
-      align-items: baseline;
     }
-    .clock-hours { color: var(--lux-red); }
-    .clock-colon {
-      opacity: 0.16;
-      margin: 0 0.04em;
+
+    /* Absolute Center Colon */
+    .clock-colon-anchor {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -54%);
+      font-size: 0.55em;
+      opacity: 0.28;
       color: var(--text-muted);
-      font-weight: 400;
+      font-weight: 300;
+      line-height: 1;
+      pointer-events: none;
     }
-    .clock-minutes { color: var(--lux-white); }
+
+    /* Hours anchored to the left of the center line */
+    .clock-hours-anchor {
+      position: absolute;
+      right: calc(50% + 0.14em);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--lux-red);
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Minutes anchored to the right of the center line */
+    .clock-minutes-anchor {
+      position: absolute;
+      left: calc(50% + 0.14em);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--lux-white);
+      text-align: left;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Trailing seconds & AM/PM: Anchored after minutes, completely decoupled from layout */
+    .clock-trailing-anchor {
+      position: absolute;
+      left: calc(100% + 0.08em);
+      bottom: 0.08em;
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 0.05em;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
     .clock-sec-colon {
-      opacity: 0.16;
+      font-size: 0.22em;
+      opacity: 0.32;
       color: var(--text-muted);
       font-weight: 400;
-      margin-left: 0.06em;
-      margin-right: 0.02em;
+      line-height: 1;
+      margin-bottom: 0.11em;
     }
+
     .clock-seconds {
-      font-size: 0.28em;
+      font-size: 0.30em;
       color: var(--lux-blue);
       font-weight: 700;
       opacity: 0.95;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
     }
+
     .clock-ampm {
-      font-size: 0.16em;
-      margin-left: 0.18em;
+      font-size: 0.15em;
+      margin-left: 0.12em;
       color: var(--lux-blue);
       font-weight: 800;
       letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 0.02em;
     }
 
     /* BOTTOM CONTAINER */
     .bottom-container {
+      position: absolute;
+      bottom: clamp(0.5rem, 1.2vw, 1rem);
+      left: clamp(0.75rem, 2vw, 1.8rem);
+      right: clamp(0.75rem, 2vw, 1.8rem);
       display: flex;
       flex-direction: column;
       gap: 5px;
-      width: 100%;
       z-index: 10;
       pointer-events: auto;
     }
 
-    /* Horizontal World Hubs Tape */
     .hubs-tape {
       display: flex;
       gap: 6px;
@@ -273,7 +344,6 @@
       font-weight: 700;
     }
 
-    /* 5 Categorized Rows */
     .tv-multi-stack {
       display: flex;
       flex-direction: column;
@@ -292,82 +362,100 @@
     }
 
     @media (max-width: 860px) {
-      .top-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .top-right-group { align-items: flex-start; }
+      body { overflow-y: auto; }
+      .dashboard { height: auto; min-height: 100dvh; }
+      .controls-container { flex-wrap: wrap; justify-content: center; }
       .center-clock-stage {
         position: relative;
-        margin: 1.2rem 0;
+        top: auto;
+        bottom: auto;
+        margin: 2.5rem 0;
       }
-      .clock-digits { font-size: clamp(7rem, 30vw, 13rem); }
+      .clock-stage-inner { font-size: clamp(4.5rem, 18vw, 7.5rem); }
+      .bottom-container {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        margin-top: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
-    <!-- Top Bar -->
-    <header class="top-bar">
+    <!-- Top Center Stack: Date -> Location -> Weather -> Switches -->
+    <header class="top-center-container">
       <div class="date-badge">
         <span class="date-iso" id="dateIso">----.--.--</span>
         <span class="day-name" id="dayName">---</span>
       </div>
 
-      <div class="top-right-group">
-        <div class="weather-forecast-strip" id="weatherStrip"></div>
-        <div class="location-card">
-          <span class="loc-city" id="locCity">Locating...</span>
-          <span class="loc-tz" id="gmtInfo">GMT+2</span>
-        </div>
-        <div class="controls-container">
-          <button class="btn-toggle active" id="themeMachine">Auto</button>
-          <button class="btn-toggle" id="themeLight">Light</button>
-          <button class="btn-toggle" id="themeDark">Dark</button>
-          <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
-          <button class="btn-toggle" id="btnSec">Sec: Off</button>
-          <button class="btn-toggle active" id="btnFmt">24H</button>
-          <button class="btn-toggle" id="btnUnit">°C</button>
-          <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
-          <button class="btn-toggle" id="btnData">Markets: Off</button>
-        </div>
+      <div class="location-card">
+        <span class="loc-city" id="locCity">Locating...</span>
+        <span class="loc-tz" id="gmtInfo">GMT+2</span>
+      </div>
+
+      <div class="weather-forecast-strip" id="weatherStrip"></div>
+
+      <div class="controls-container">
+        <button class="btn-toggle active" id="themeMachine">Auto</button>
+        <button class="btn-toggle" id="themeLight">Light</button>
+        <button class="btn-toggle" id="themeDark">Dark</button>
+        <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
+        <button class="btn-toggle" id="btnSec">Sec: Off</button>
+        <button class="btn-toggle active" id="btnFmt">24H</button>
+        <button class="btn-toggle" id="btnUnit">°C</button>
+        <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
+        <button class="btn-toggle" id="btnData">Markets: Off</button>
+        <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
+        <button class="btn-toggle btn-icon" id="btnFullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <svg id="fsIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
       </div>
     </header>
 
-    <!-- Center Clock -->
+    <!-- Center Clock: Absolutely Anchored, Zero Lateral Movement -->
     <main class="center-clock-stage">
-      <div class="clock-digits">
-        <span id="mainHours" class="clock-hours">00</span>
-        <span class="clock-colon">:</span>
-        <span id="mainMinutes" class="clock-minutes">00</span>
-        <span id="colonSec" class="clock-sec-colon" style="display:none;">:</span>
-        <span id="mainSeconds" class="clock-seconds" style="display:none;">00</span>
-        <span id="mainAmpm" class="clock-ampm" style="display:none;">AM</span>
+      <div class="clock-stage-inner">
+        <!-- Pinned Center Colon -->
+        <span class="clock-colon-anchor">:</span>
+
+        <!-- Left Half: Hours -->
+        <div class="clock-hours-anchor">
+          <span id="mainHours">00</span>
+        </div>
+
+        <!-- Right Half: Minutes + Floating Seconds -->
+        <div class="clock-minutes-anchor">
+          <span id="mainMinutes">00</span>
+          <div class="clock-trailing-anchor">
+            <span id="colonSec" class="clock-sec-colon" style="display:none;">:</span>
+            <span id="mainSeconds" class="clock-seconds" style="display:none;">00</span>
+            <span id="mainAmpm" class="clock-ampm" style="display:none;">AM</span>
+          </div>
+        </div>
       </div>
     </main>
 
-    <!-- Bottom Container: 20 World Hubs + 5 Curated Market Rows -->
+    <!-- Bottom Container: World Hubs + Markets Stack -->
     <footer class="bottom-container">
       <div class="hubs-tape" id="timesTape"></div>
 
       <!-- Hidden by default -->
       <div class="tv-multi-stack" id="tvMultiStack" style="display: none;">
-        <!-- 1. Currencies -->
         <div class="tv-row-card" id="tvCurrencies"></div>
-        <!-- 2. Stock Exchanges -->
         <div class="tv-row-card" id="tvIndices"></div>
-        <!-- 3. Metals -->
         <div class="tv-row-card" id="tvMetals"></div>
-        <!-- 4. Commodities -->
         <div class="tv-row-card" id="tvCommodities"></div>
-        <!-- 5. Coins -->
         <div class="tv-row-card" id="tvCrypto"></div>
       </div>
     </footer>
   </div>
 
   <script>
-    // Global Hubs in Specified Chronological Order
     const HUBS = [
       { name: "San Francisco", zone: "America/Los_Angeles" },
       { name: "Chicago", zone: "America/Chicago" },
@@ -402,11 +490,15 @@
       { "description": "EUR / CHF", "proName": "FX_IDC:EURCHF" },
       { "description": "USD / CHF", "proName": "FX:USDCHF" },
       { "description": "EUR / JPY", "proName": "FX_IDC:EURJPY" },
+      { "description": "GBP / JPY", "proName": "FX:GBPJPY" },
       { "description": "EUR / CNY", "proName": "FX_IDC:EURCNY" },
       { "description": "USD / CNY", "proName": "FX_IDC:USDCNY" },
       { "description": "EUR / AUD", "proName": "FX_IDC:EURAUD" },
       { "description": "AUD / USD", "proName": "FX:AUDUSD" },
-      { "description": "USD / CAD", "proName": "FX:USDCAD" }
+      { "description": "USD / CAD", "proName": "FX:USDCAD" },
+      { "description": "EUR / CAD", "proName": "FX_IDC:EURCAD" },
+      { "description": "NZD / USD", "proName": "FX:NZDUSD" },
+      { "description": "USD / ZAR", "proName": "FX:USDZAR" }
     ];
 
     // 2. Stock Indices
@@ -418,43 +510,50 @@
       { "description": "Euro Stoxx 50", "proName": "INDEX:SX5E" },
       { "description": "CAC 40", "proName": "FOREXCOM:FRA40" },
       { "description": "Hang Seng", "proName": "HSI:HSI" },
-      { "description": "IBEX 35", "proName": "FOREXCOM:ESP35" },
-      { "description": "FTSE MIB", "proName": "FOREXCOM:ITA40" },
-      { "description": "SMI 20", "proName": "FOREXCOM:SWI20" },
-      { "description": "ASX 200", "proName": "FOREXCOM:AUS200" },
-      { "description": "AEX Index", "proName": "FOREXCOM:NETH25" }
+      { "description": "Nikkei 225", "proName": "FOREXCOM:JP225" },
+      { "description": "Australia 200", "proName": "FOREXCOM:AUS200" },
+      { "description": "Netherlands 25", "proName": "FOREXCOM:NETH25" },
+      { "description": "China 50", "proName": "FOREXCOM:CHINA50" },
+      { "description": "SPDR S&P 500", "proName": "AMEX:SPY" },
+      { "description": "Invesco QQQ", "proName": "NASDAQ:QQQ" },
+      { "description": "Emerging Markets", "proName": "AMEX:EEM" },
+      { "description": "Total World ETF", "proName": "AMEX:VT" }
     ];
 
     // 3. Metals
     const TV_METALS = [
       { "description": "Gold (USD/oz)", "proName": "TVC:GOLD" },
       { "description": "Silver (USD/oz)", "proName": "TVC:SILVER" },
-      { "description": "Copper (USD/oz)", "proName": "OANDA:XCUUSD" },
+      { "description": "Platinum (USD/oz)", "proName": "TVC:PLATINUM" },
+      { "description": "Palladium (USD/oz)", "proName": "TVC:PALLADIUM" },
       { "description": "Gold (TRY/g)", "proName": "FX_IDC:XAUTRYG" },
       { "description": "Silver (TRY/g)", "proName": "FX_IDC:XAGTRYG" },
-      { "description": "Platinum (USD)", "proName": "TVC:PLATINUM" },
-      { "description": "Palladium (USD)", "proName": "TVC:PALLADIUM" },
-      { "description": "Gold (GBP)", "proName": "FOREXCOM:XAUGBP" },
-      { "description": "Silver (GBP)", "proName": "FOREXCOM:XAGGBP" },
-      { "description": "Gold (CHF)", "proName": "OANDA:XAUCHF" },
-      { "description": "Gold (JPY)", "proName": "OANDA:XAUJPY" },
-      { "description": "Gold (AUD)", "proName": "OANDA:XAUAUD" }
+      { "description": "Gold Shares (GLD)", "proName": "AMEX:GLD" },
+      { "description": "Silver Trust (SLV)", "proName": "AMEX:SLV" },
+      { "description": "Gold Trust (IAU)", "proName": "AMEX:IAU" },
+      { "description": "Physical Platinum", "proName": "AMEX:PPLT" },
+      { "description": "Physical Palladium", "proName": "AMEX:PALL" },
+      { "description": "Copper Index (CPER)", "proName": "AMEX:CPER" },
+      { "description": "Gold Miners (GDX)", "proName": "AMEX:GDX" },
+      { "description": "Silver Miners (SIL)", "proName": "AMEX:SIL" },
+      { "description": "Copper Miners (COPX)", "proName": "AMEX:COPX" }
     ];
 
     // 4. Commodities
     const TV_COMMODITIES = [
       { "description": "Brent Crude", "proName": "TVC:UKOIL" },
       { "description": "WTI Crude", "proName": "TVC:USOIL" },
-      { "description": "Natural Gas", "proName": "OANDA:NATGASUSD" },
-      { "description": "Brent Oil (CFD)", "proName": "OANDA:BCOUSD" },
-      { "description": "WTI Oil (CFD)", "proName": "OANDA:WTICOUSD" },
-      { "description": "Corn", "proName": "OANDA:CORNUSD" },
-      { "description": "Wheat", "proName": "OANDA:WHEATUSD" },
-      { "description": "Sugar", "proName": "OANDA:SUGARUSD" },
-      { "description": "Soybeans", "proName": "OANDA:SOYBNUSD" },
-      { "description": "US Oil Fund", "proName": "AMEX:USO" },
-      { "description": "Brent Oil Fund", "proName": "AMEX:BNO" },
-      { "description": "Agriculture Fund", "proName": "AMEX:DBA" }
+      { "description": "US Oil Fund (USO)", "proName": "AMEX:USO" },
+      { "description": "Brent Oil Fund (BNO)", "proName": "AMEX:BNO" },
+      { "description": "Natural Gas (UNG)", "proName": "AMEX:UNG" },
+      { "description": "Gasoline Fund (UGA)", "proName": "AMEX:UGA" },
+      { "description": "Agriculture (DBA)", "proName": "AMEX:DBA" },
+      { "description": "Wheat Fund (WEAT)", "proName": "AMEX:WEAT" },
+      { "description": "Corn Fund (CORN)", "proName": "AMEX:CORN" },
+      { "description": "Soybean Fund (SOYB)", "proName": "AMEX:SOYB" },
+      { "description": "Sugar Fund (CANE)", "proName": "AMEX:CANE" },
+      { "description": "Commodity Index (DBC)", "proName": "AMEX:DBC" },
+      { "description": "GSCI Commodity (GSG)", "proName": "AMEX:GSG" }
     ];
 
     // 5. Coins
@@ -472,7 +571,9 @@
       { "description": "TRON", "proName": "BINANCE:TRXUSDT" },
       { "description": "Sui", "proName": "BINANCE:SUIUSDT" },
       { "description": "NEAR", "proName": "BINANCE:NEARUSDT" },
-      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" }
+      { "description": "Litecoin", "proName": "BINANCE:LTCUSDT" },
+      { "description": "Toncoin", "proName": "BINANCE:TONUSDT" },
+      { "description": "Shiba Inu", "proName": "BINANCE:SHIBUSDT" }
     ];
 
     let state = {
@@ -544,7 +645,8 @@
         ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12 || 12;
       }
-      const formattedHours = state.use24Hour ? String(hours).padStart(2, '0') : String(hours);
+      // Strictly pad to two digits in both modes so character width never shifts
+      const formattedHours = String(hours).padStart(2, '0');
 
       document.getElementById('mainHours').textContent = formattedHours;
       document.getElementById('mainMinutes').textContent = mins;
@@ -552,12 +654,12 @@
       const secEl = document.getElementById('mainSeconds');
       const secColon = document.getElementById('colonSec');
       secEl.textContent = secs;
-      secEl.style.display = state.showSeconds ? 'inline' : 'none';
-      secColon.style.display = state.showSeconds ? 'inline' : 'none';
+      secEl.style.display = state.showSeconds ? 'inline-block' : 'none';
+      secColon.style.display = state.showSeconds ? 'inline-block' : 'none';
 
       const ampmEl = document.getElementById('mainAmpm');
       ampmEl.textContent = ampm;
-      ampmEl.style.display = !state.use24Hour ? 'inline' : 'none';
+      ampmEl.style.display = !state.use24Hour ? 'inline-block' : 'none';
 
       const offsetMinutes = -now.getTimezoneOffset();
       const offsetHours = offsetMinutes / 60;
@@ -586,7 +688,7 @@
         } else {
           const ampm = h >= 12 ? 'PM' : 'AM';
           const h12 = h % 12 || 12;
-          formattedTime = `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+          formattedTime = `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
         }
 
         const dayDiff = day - now.getDate();
@@ -638,7 +740,7 @@
         } else {
           const ampm = hVal >= 12 ? 'PM' : 'AM';
           const h12 = hVal % 12 || 12;
-          hourLabel = `${h12} ${ampm}`;
+          hourLabel = `${String(h12).padStart(2, '0')} ${ampm}`;
         }
 
         const tempVal = state.tempUnit === 'C'
@@ -735,6 +837,35 @@
         await ipFallback();
       }
     }
+
+    // Fullscreen Toggle
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const fsIcon = document.getElementById('fsIcon');
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn(`Fullscreen error: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function updateFsIcon() {
+      const isFs = !!document.fullscreenElement;
+      btnFullscreen.classList.toggle('active', isFs);
+      if (isFs) {
+        fsIcon.innerHTML = '<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6 7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6 7-7"/>';
+      } else {
+        fsIcon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>';
+      }
+    }
+
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', updateFsIcon);
 
     document.getElementById('themeMachine').onclick = () => { state.theme = 'machine'; applyTheme(); };
     document.getElementById('themeLight').onclick = () => { state.theme = 'light'; applyTheme(); };
