@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Time & Market Hubs Dashboard</title>
   <style>
     :root {
       --bg-color: #000000;
@@ -41,22 +41,23 @@
 
     html, body {
       width: 100%;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+    /* Scalable layout container using dynamic viewport units (dvh/dvw) */
     .dashboard {
-      height: 100vh;
-      width: 100vw;
-      padding: 1.8rem 3rem 2.4rem 3rem;
+      min-height: 100dvh;
+      width: 100dvw;
+      padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 3.5vw, 3rem);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
+      overflow-x: hidden;
     }
 
     /* Top: Centered Date */
@@ -65,33 +66,35 @@
       justify-content: center;
       align-items: center;
       z-index: 10;
+      width: 100%;
     }
 
     .date-badge {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: clamp(8px, 1.5vw, 18px);
       background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      padding: 9px 27px;
+      border: 1px solid var(--card-border);
+      padding: clamp(6px, 1vw, 9px) clamp(14px, 2vw, 27px);
       border-radius: 9999px;
+      backdrop-filter: blur(8px);
     }
     .date-iso {
-      font-size: 1.75rem;
+      font-size: clamp(1rem, 2.2vw, 1.75rem);
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       color: var(--lux-blue);
       font-variant-numeric: tabular-nums;
     }
     .day-name {
-      font-size: 1.25rem;
+      font-size: clamp(0.75rem, 1.4vw, 1.25rem);
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
     }
 
-    /* Center Stage: Main Clock (-30% size) */
+    /* Responsive Main Clock: layered seamlessly in background */
     .center-clock-stage {
       position: absolute;
       inset: 0;
@@ -102,9 +105,9 @@
       z-index: 1;
     }
     .clock-digits {
-      font-size: clamp(11.5rem, 35vw, 33.5rem);
+      font-size: clamp(4.5rem, 23vw, 24rem);
       font-weight: 900;
-      letter-spacing: -6px;
+      letter-spacing: -0.04em;
       line-height: 0.85;
       font-variant-numeric: tabular-nums;
       display: flex;
@@ -126,7 +129,7 @@
       opacity: 0.16;
       color: var(--text-muted);
       font-weight: 400;
-      margin-left: 0.08em;
+      margin-left: 0.06em;
       margin-right: 0.02em;
     }
     .clock-seconds {
@@ -137,65 +140,69 @@
     }
     .clock-ampm {
       font-size: 0.16em;
-      margin-left: 0.2em;
+      margin-left: 0.18em;
       color: var(--lux-blue);
       font-weight: 800;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
     }
 
-    /* Bottom Row */
+    /* Bottom Section */
     .bottom-row {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      gap: 3rem;
+      gap: clamp(1rem, 2.5vw, 3rem);
       z-index: 10;
       pointer-events: auto;
+      width: 100%;
     }
 
-    /* Left: Vertically Stacked Hubs with Stock Badges */
+    /* Left: Vertically Stacked Hubs */
     .hubs-vertical-list {
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      max-height: 52vh;
+      gap: clamp(4px, 0.8vh, 7px);
+      max-height: 48dvh;
       overflow-y: auto;
-      padding-right: 9px;
+      padding-right: 6px;
       scrollbar-width: thin;
       scrollbar-color: var(--card-border) transparent;
     }
     .hubs-vertical-list::-webkit-scrollbar {
-      width: 6px;
+      width: 4px;
     }
     .hubs-vertical-list::-webkit-scrollbar-thumb {
       background: var(--card-border);
-      border-radius: 6px;
+      border-radius: 4px;
     }
 
     .hub-pill {
       background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      border-radius: 10px;
-      padding: 7px 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: clamp(4px, 0.7vh, 7px) clamp(8px, 1.2vw, 16px);
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      font-size: 1.05rem;
-      min-width: 440px;
+      gap: clamp(8px, 1.5vw, 18px);
+      font-size: clamp(0.75rem, 1.2vw, 1.05rem);
+      width: clamp(260px, 32vw, 440px);
     }
     .hub-name-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     .hub-name {
       color: var(--text-muted);
       font-weight: 500;
     }
     .hub-ticker {
-      font-size: 0.78rem;
+      font-size: 0.75em;
       color: var(--text-muted);
       opacity: 0.75;
       font-weight: 600;
@@ -204,41 +211,41 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 12px;
+      gap: clamp(4px, 0.8vw, 10px);
     }
     .hub-day-offset-slot {
-      width: 32px;
+      width: 26px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .hub-day-offset {
-      font-size: 0.82rem;
+      font-size: 0.75em;
       color: var(--lux-blue);
       font-weight: 700;
       background: rgba(58, 175, 227, 0.14);
-      padding: 2px 6px;
-      border-radius: 5px;
+      padding: 1px 4px;
+      border-radius: 4px;
       line-height: 1;
     }
     .hub-time {
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: var(--text-main);
-      min-width: 60px;
+      min-width: 44px;
       text-align: right;
     }
     .hub-market-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 2px 8px;
-      border-radius: 6px;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 5px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
-      font-size: 0.88rem;
+      font-size: 0.82em;
       font-variant-numeric: tabular-nums;
-      min-width: 135px;
+      min-width: 98px;
       justify-content: flex-end;
     }
     .stock-close {
@@ -249,29 +256,25 @@
       font-weight: 700;
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 1px;
     }
-    .stock-up {
-      color: var(--stock-green);
-    }
-    .stock-down {
-      color: var(--stock-red);
-    }
+    .stock-up { color: var(--stock-green); }
+    .stock-down { color: var(--stock-red); }
 
     /* Right Stack */
     .right-corner-stack {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 12px;
+      gap: clamp(6px, 1.2vh, 12px);
     }
 
     .controls-container {
       display: flex;
-      gap: 5px;
+      gap: 3px;
       background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      padding: 6px 9px;
+      border: 1px solid var(--card-border);
+      padding: 4px 6px;
       border-radius: 9999px;
     }
 
@@ -279,15 +282,15 @@
       border: none;
       background: transparent;
       color: var(--text-muted);
-      padding: 6px 15px;
-      font-size: 1.05rem;
+      padding: clamp(4px, 0.7vh, 6px) clamp(8px, 1.1vw, 14px);
+      font-size: clamp(0.72rem, 1.1vw, 1.05rem);
       font-weight: 600;
       border-radius: 9999px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
       transition: all 0.2s ease;
+      touch-action: manipulation;
     }
     .btn-toggle.active {
       background: var(--lux-red);
@@ -301,38 +304,101 @@
     .weather-forecast-strip {
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
+      gap: clamp(4px, 0.6vw, 8px);
     }
     .weather-cell {
       background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      border-radius: 11px;
-      padding: 6px 11px;
+      border: 1px solid var(--card-border);
+      border-radius: 9px;
+      padding: clamp(3px, 0.6vh, 6px) clamp(6px, 0.8vw, 10px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 72px;
+      min-width: clamp(46px, 5.5vw, 68px);
     }
     .weather-hour {
-      font-size: 0.92rem;
+      font-size: clamp(0.65rem, 0.95vw, 0.92rem);
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
       font-weight: 600;
     }
-    .weather-icon { font-size: 1.3rem; margin: 2px 0; }
-    .weather-temp { font-size: 1.1rem; font-weight: 700; }
-    .weather-pop { font-size: 0.88rem; color: var(--lux-blue); font-weight: 600; }
+    .weather-icon {
+      font-size: clamp(0.85rem, 1.3vw, 1.3rem);
+      margin: 1px 0;
+    }
+    .weather-temp {
+      font-size: clamp(0.75rem, 1.15vw, 1.1rem);
+      font-weight: 700;
+    }
+    .weather-pop {
+      font-size: clamp(0.6rem, 0.9vw, 0.88rem);
+      color: var(--lux-blue);
+      font-weight: 600;
+    }
 
     .location-card {
       background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      border-radius: 12px;
-      padding: 9px 21px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: clamp(5px, 0.9vh, 9px) clamp(10px, 1.5vw, 20px);
       text-align: right;
       white-space: nowrap;
     }
-    .loc-city { font-size: 1.25rem; font-weight: 700; }
-    .loc-tz { font-size: 1.05rem; color: var(--lux-blue); font-weight: 600; margin-top: 2px; }
+    .loc-city {
+      font-size: clamp(0.8rem, 1.3vw, 1.25rem);
+      font-weight: 700;
+    }
+    .loc-tz {
+      font-size: clamp(0.68rem, 1.1vw, 1.05rem);
+      color: var(--lux-blue);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Phone & Tablet Responsive Overrides */
+    @media (max-width: 860px) {
+      .dashboard {
+        padding: 1rem;
+        gap: 1.2rem;
+        min-height: auto;
+      }
+      .center-clock-stage {
+        position: relative;
+        margin: 1.5rem 0;
+      }
+      .clock-digits {
+        font-size: clamp(4.5rem, 20vw, 8rem);
+      }
+      .bottom-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        gap: 1.25rem;
+      }
+      .hubs-vertical-list {
+        max-height: none;
+        width: 100%;
+      }
+      .hub-pill {
+        width: 100%;
+        min-width: unset;
+      }
+      .right-corner-stack {
+        align-items: stretch;
+        width: 100%;
+      }
+      .controls-container {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .weather-forecast-strip {
+        justify-content: space-between;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .location-card {
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -345,7 +411,7 @@
       </div>
     </header>
 
-    <!-- Main Clock Stage -->
+    <!-- Scalable Center Clock -->
     <main class="center-clock-stage">
       <div class="clock-digits">
         <span id="mainHours" class="clock-hours">00</span>
@@ -357,28 +423,28 @@
       </div>
     </main>
 
-    <!-- Bottom Row -->
+    <!-- Bottom Section: Hubs on Left, Stacked Controls on Right -->
     <div class="bottom-row">
-      <!-- 5 Selected Hubs with Times & Stock Closing + % -->
+      <!-- 5 Selected Hubs -->
       <div class="hubs-vertical-list" id="hubsList"></div>
 
-      <!-- Right Column: Controls, Weather, Location Stacked -->
+      <!-- Right Column: Switches, Weather, Location -->
       <div class="right-corner-stack">
         <!-- Switches -->
         <div class="controls-container">
           <button class="btn-toggle active" id="themeMachine">Auto</button>
           <button class="btn-toggle" id="themeLight">Light</button>
           <button class="btn-toggle" id="themeDark">Dark</button>
-          <span style="width:2px; background:var(--card-border); margin:2px 2px;"></span>
+          <span style="width:1px; background:var(--card-border); margin:2px 1px;"></span>
           <button class="btn-toggle" id="btnSec">Sec: Off</button>
           <button class="btn-toggle active" id="btnFmt">24H</button>
           <button class="btn-toggle" id="btnUnit">°C</button>
         </div>
 
-        <!-- Weather -->
+        <!-- Hourly Weather Strip -->
         <div class="weather-forecast-strip" id="weatherStrip"></div>
 
-        <!-- City Location Card -->
+        <!-- Location Card -->
         <div class="location-card">
           <div class="loc-city">Kirchberg, Luxembourg</div>
           <div class="loc-tz" id="gmtInfo">GMT+2</div>
@@ -388,7 +454,6 @@
   </div>
 
   <script>
-    // Only the 5 requested financial hubs with their primary benchmark exchange closing info
     const HUBS = [
       {
         name: "Cayman Islands",
