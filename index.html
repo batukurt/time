@@ -389,21 +389,21 @@
         <span class="loc-tz" id="gmtInfo">GMT+2</span>
       </div>
 
-      <!-- Weather Forecast Strip: Expanded to 8 Hours -->
+      <!-- Weather Forecast Strip: 8 Hours -->
       <div class="weather-forecast-strip" id="weatherStrip"></div>
 
       <div class="controls-container">
-        <button class="btn-toggle active" id="themeMachine">Auto</button>
-        <button class="btn-toggle" id="themeLight">Light</button>
-        <button class="btn-toggle" id="themeDark">Dark</button>
+        <button class="btn-toggle active" id="themeMachine" title="Auto Theme (A)">Auto</button>
+        <button class="btn-toggle" id="themeLight" title="Light Theme (L)">Light</button>
+        <button class="btn-toggle" id="themeDark" title="Dark Theme (D)">Dark</button>
         <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
-        <button class="btn-toggle" id="btnSec">Sec: Off</button>
-        <button class="btn-toggle active" id="btnFmt">24H</button>
-        <button class="btn-toggle" id="btnUnit">°C</button>
+        <button class="btn-toggle" id="btnSec" title="Toggle Seconds (S)">Sec: Off</button>
+        <button class="btn-toggle active" id="btnFmt" title="Toggle 12/24H (H)">24H</button>
+        <button class="btn-toggle" id="btnUnit" title="Toggle Unit (C)">°C</button>
         <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
-        <button class="btn-toggle" id="btnData">Markets: Off</button>
+        <button class="btn-toggle" id="btnData" title="Toggle Markets (M)">Markets: Off</button>
         <span style="width:1px; height:12px; background:var(--card-border); margin:0 2px;"></span>
-        <button class="btn-toggle btn-icon" id="btnFullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+        <button class="btn-toggle btn-icon" id="btnFullscreen" title="Toggle Fullscreen (F)" aria-label="Toggle Fullscreen">
           <svg id="fsIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
           </svg>
@@ -635,7 +635,6 @@
         ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12 || 12;
       }
-      // Strictly pad to two digits in both modes so character width never shifts
       const formattedHours = String(hours).padStart(2, '0');
 
       document.getElementById('mainHours').textContent = formattedHours;
@@ -759,7 +758,6 @@
         let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourISO));
         if (startIndex === -1) startIndex = 0;
 
-        // Fetch 8 consecutive hours (current + next 7)
         const next8Hours = [];
         for (let i = 0; i < 8; i++) {
           const idx = startIndex + i;
@@ -829,6 +827,40 @@
       }
     }
 
+    // Toggle Actions Handlers
+    function toggleSeconds() {
+      state.showSeconds = !state.showSeconds;
+      document.getElementById('btnSec').textContent = state.showSeconds ? 'Sec: On' : 'Sec: Off';
+      document.getElementById('btnSec').classList.toggle('active', state.showSeconds);
+      updateMainClock();
+    }
+
+    function toggleFormat() {
+      state.use24Hour = !state.use24Hour;
+      document.getElementById('btnFmt').textContent = state.use24Hour ? '24H' : '12H';
+      updateMainClock();
+      updateHubTimes();
+      renderWeatherStrip();
+    }
+
+    function toggleTemperatureUnit() {
+      state.tempUnit = state.tempUnit === 'C' ? 'F' : 'C';
+      document.getElementById('btnUnit').textContent = `°${state.tempUnit}`;
+      renderWeatherStrip();
+    }
+
+    function toggleMarkets() {
+      state.showMarkets = !state.showMarkets;
+      document.getElementById('btnData').textContent = state.showMarkets ? 'Markets: On' : 'Markets: Off';
+      document.getElementById('btnData').classList.toggle('active', state.showMarkets);
+      document.getElementById('tvMultiStack').style.display = state.showMarkets ? 'flex' : 'none';
+    }
+
+    function setTheme(theme) {
+      state.theme = theme;
+      applyTheme();
+    }
+
     // Fullscreen Toggle
     const btnFullscreen = document.getElementById('btnFullscreen');
     const fsIcon = document.getElementById('fsIcon');
@@ -858,37 +890,55 @@
     btnFullscreen.addEventListener('click', toggleFullscreen);
     document.addEventListener('fullscreenchange', updateFsIcon);
 
-    document.getElementById('themeMachine').onclick = () => { state.theme = 'machine'; applyTheme(); };
-    document.getElementById('themeLight').onclick = () => { state.theme = 'light'; applyTheme(); };
-    document.getElementById('themeDark').onclick = () => { state.theme = 'dark'; applyTheme(); };
+    // Mouse Controls
+    document.getElementById('themeMachine').onclick = () => setTheme('machine');
+    document.getElementById('themeLight').onclick = () => setTheme('light');
+    document.getElementById('themeDark').onclick = () => setTheme('dark');
+    document.getElementById('btnSec').onclick = toggleSeconds;
+    document.getElementById('btnFmt').onclick = toggleFormat;
+    document.getElementById('btnUnit').onclick = toggleTemperatureUnit;
+    document.getElementById('btnData').onclick = toggleMarkets;
 
-    document.getElementById('btnSec').onclick = () => {
-      state.showSeconds = !state.showSeconds;
-      document.getElementById('btnSec').textContent = state.showSeconds ? 'Sec: On' : 'Sec: Off';
-      document.getElementById('btnSec').classList.toggle('active', state.showSeconds);
-      updateMainClock();
-    };
+    // Comprehensive Keyboard Shortcuts: 'C' toggles between °C and °F
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.isComposing) return;
+      const key = e.key.toLowerCase();
 
-    document.getElementById('btnFmt').onclick = () => {
-      state.use24Hour = !state.use24Hour;
-      document.getElementById('btnFmt').textContent = state.use24Hour ? '24H' : '12H';
-      updateMainClock();
-      updateHubTimes();
-      renderWeatherStrip();
-    };
-
-    document.getElementById('btnUnit').onclick = () => {
-      state.tempUnit = state.tempUnit === 'C' ? 'F' : 'C';
-      document.getElementById('btnUnit').textContent = `°${state.tempUnit}`;
-      renderWeatherStrip();
-    };
-
-    document.getElementById('btnData').onclick = () => {
-      state.showMarkets = !state.showMarkets;
-      document.getElementById('btnData').textContent = state.showMarkets ? 'Markets: On' : 'Markets: Off';
-      document.getElementById('btnData').classList.toggle('active', state.showMarkets);
-      document.getElementById('tvMultiStack').style.display = state.showMarkets ? 'flex' : 'none';
-    };
+      switch (key) {
+        case 'm':
+          e.preventDefault();
+          toggleMarkets();
+          break;
+        case 'h':
+          e.preventDefault();
+          toggleFormat();
+          break;
+        case 's':
+          e.preventDefault();
+          toggleSeconds();
+          break;
+        case 'l':
+          e.preventDefault();
+          setTheme('light');
+          break;
+        case 'd':
+          e.preventDefault();
+          setTheme('dark');
+          break;
+        case 'a':
+          e.preventDefault();
+          setTheme('machine');
+          break;
+        case 'c':
+          e.preventDefault();
+          toggleTemperatureUnit();
+          break;
+        case 'f':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+      }
+    });
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (state.theme === 'machine') applyTheme();
